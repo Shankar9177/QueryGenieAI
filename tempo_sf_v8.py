@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from pandasai import PandasAI
-from pandasai.llm.azure_openai import AzureOpenAI  # Change import statementsc
+#from pandasai.llm.azure_openai import AzureOpenAI  # Change import statementsc
 import os
 import time 
 import pandas as pd

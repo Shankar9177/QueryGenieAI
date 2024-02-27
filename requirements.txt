@@ -1,8 +1,8 @@
 ﻿streamlit
-pandasai==1.1
-ydata_profiling==4.6.4
+pandasai
+ydata_profiling
 beautifulsoup4
-pydantic<2
+pydantic
 snowflake-connector-python
 langchain
 openai

@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from pandasai import PandasAI
+from pandasai import pandasai
 from pandasai.llm.azure_openai import AzureOpenAI  # Change import statementsc
 import os
 import time 
@@ -20,8 +20,8 @@ openai_api_key = "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"
 # Create an LLM by instantiating OpenAI object and passing the API token
 llm = OpenAI(api_token=openai_api_key)
 # Create PandasAI object, passing the LLM
-#pandas_ai = PandasAI(llm, save_charts=True)
-pandas_ai = PandasAI(llm, save_charts=True, save_charts_path =  "exports\\charts\\temp_chart.png")
+#pandas_ai = pandasai(llm, save_charts=True)
+pandas_ai = pandasai(llm, save_charts=True, save_charts_path =  "exports\\charts\\temp_chart.png")
 
 
 # st.image("QG_logo3.png")  # Adjust width as needed

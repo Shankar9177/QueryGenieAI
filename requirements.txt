@@ -2,7 +2,7 @@
 pandasai==1.1
 ydata_profiling==4.6.4
 beautifulsoup4
-pydantic==2.6.0
+pydantic<2
 snowflake-connector-python
 langchain
 openai

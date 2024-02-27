@@ -1,5 +1,5 @@
 ﻿streamlit
-pandasai
+pandasai==0.2.1
 ydata_profiling
 beautifulsoup4
 pydantic

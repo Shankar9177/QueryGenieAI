@@ -15,20 +15,53 @@ from pdf_processor import process_pdf_and_answer_questions
 from snowflake_processor import process_snowflake_data
 from azure_config import AZURE_OPENAI_API_KEY 
 import pickle
-# Cache class for storing intermediate data
+import shelve
+from retrying import retry
+
+CACHE_FILE_PATH = '/app/cache/cache.pkl'
+
+@retry(stop_max_attempt_number=3, wait_fixed=1000)  # Retry 3 times with a fixed delay of 1 second between retries
+def open_cache_file():
+    try:
+        cache = shelve.open(CACHE_FILE_PATH, 'c')
+        return cache
+    except Exception as e:
+        print(f"Error accessing cache file: {e}")
+        raise  # Re-raise the exception to trigger retry
 class Cache:
     def __init__(self):
-        self.filepath = os.path.join(tempfile.gettempdir(), 'cache.pkl')
+        self.cache_file_path = '/app/cache/cache.pkl'
         self.cache = {}
 
     def load(self):
-        if os.path.exists(self.filepath):
-            with open(self.filepath, 'rb') as f:
+        if os.path.exists(self.cache_file_path):
+            with open(self.cache_file_path, 'rb') as f:
                 self.cache = pickle.load(f)
 
     def dump(self):
-        with open(self.filepath, 'wb') as f:
+        with open(self.cache_file_path, 'wb') as f:
             pickle.dump(self.cache, f)
+
+# Usage example
+try:
+    cache = open_cache_file()
+    # Perform operations with the cache file
+    # ...
+    cache.close()
+except Exception as e:
+    print(f"Failed to access cache file after retries: {e}")
+
+# Load dataframes from cache or create new ones if they don't exist
+def _load_dfs(self, dfs):
+    for df in dfs:
+        if df.name in self.cache:
+            df._df = self.cache[df.name]
+        else:
+            self.cache[df.name] = df._df = df._df.copy()
+            self._save_dfs()
+
+# Make sure to call cache.dump() to save the cache after modifying it
+
 # Set your Azure OpenAI API key
 azure_openai_api_key = AZURE_OPENAI_API_KEY
  
@@ -39,9 +72,7 @@ llm = AzureOpenAI(
     api_base = "https://i2r-openai.openai.azure.com/",
     api_version="2023-07-01-preview"
 )
-# Initialize Cache object
-cache = Cache()
-cache.load()  # Load cache from disk
+
 # Create PandasAI object, passing the LLM
 #pandas_ai = PandasAI(llm, save_charts=True)
 pandas_ai = PandasAI(llm, save_charts=True, save_charts_path =  "exports\\charts\\temp_chart.png")

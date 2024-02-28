@@ -10,3 +10,4 @@ PyPDF2
 faiss-cpu
 tiktoken
 streamlit_pandas_profiling
+retrying

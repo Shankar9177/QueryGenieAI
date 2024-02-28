@@ -181,7 +181,6 @@ with st.expander("Want to connect to your Snowflake?"):
 #Process the uploaded PDF file and store a profile report only when first created
 if pdf_uploaded_file:
     pdf_file_content = pdf_uploaded_file.read()
-    cache.dump()  # Dump cache to disk after processing PDF file
 
 # Display the uploaded CSV files
 if uploaded_files:
@@ -195,7 +194,6 @@ if uploaded_files:
 
         st.subheader(f"Uploaded Table {file_num}")
         st.dataframe(df)
-        cache.dump()  # Dump cache to disk after reading CSV files
 # Remove profiles associated with removed CSV files
 existing_profiles = list(st.session_state.profiles.keys())
 for existing_profile in existing_profiles:

@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from pandasai import PandasAI
-#from pandasai.llm.azure_openai import AzureOpenAI  # Change import statementsc
+from pandasai.llm.azure_openai import AzureOpenAI 
 import os
 import time 
 import pandas as pd
@@ -13,12 +13,18 @@ import tempfile
 from pandasai.llm.openai import OpenAI
 from pdf_processor import process_pdf_and_answer_questions
 from snowflake_processor import process_snowflake_data
+from azure_config import AZURE_OPENAI_API_KEY 
 
-# Set your OpenAI API key
-openai_api_key = "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"
+# Set your Azure OpenAI API key
+azure_openai_api_key = AZURE_OPENAI_API_KEY
  
-# Create an LLM by instantiating OpenAI object and passing the API token
-llm = OpenAI(api_token=openai_api_key)
+# Create an LLM by instantiating AzureOpenAI object and passing the API token
+llm = AzureOpenAI(
+    deployment_name="i2r-gpt-35-turbo-instruct",
+    api_token=azure_openai_api_key,
+    api_base = "https://i2r-openai.openai.azure.com/",
+    api_version="2023-07-01-preview"
+)
 # Create PandasAI object, passing the LLM
 #pandas_ai = PandasAI(llm, save_charts=True)
 pandas_ai = PandasAI(llm, save_charts=True, save_charts_path =  "exports\\charts\\temp_chart.png")
@@ -64,6 +70,10 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.profiles = {}  # Initialize the profiles dictionary
     st.session_state.selected_tables = []  # Initialize selected Snowflake tabless
+
+
+
+
 # Allow user to upload multiple CSV files for analysis
 uploaded_files = st.file_uploader("Upload CSV files here for analysis", type=['csv'], accept_multiple_files=True)
 #Allow user to upload a PDF file for analysis
@@ -191,7 +201,7 @@ if prompt := st.chat_input("Ask me anything 😉"):
     elif "@chatdoc" in prompt.lower():
          with st.chat_message("assistant"):
             modified_prompt = prompt.replace("@chatdoc", "").strip()
-            result = process_pdf_and_answer_questions(pdf_file_content, modified_prompt, openai_api_key)
+            result = process_pdf_and_answer_questions(pdf_file_content, modified_prompt, azure_openai_api_key)
             st.write(result)
 
     elif "@chatsnow" in prompt.lower():

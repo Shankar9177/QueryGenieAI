@@ -14,7 +14,21 @@ from pandasai.llm.openai import OpenAI
 from pdf_processor import process_pdf_and_answer_questions
 from snowflake_processor import process_snowflake_data
 from azure_config import AZURE_OPENAI_API_KEY 
+import pickle
+# Cache class for storing intermediate data
+class Cache:
+    def __init__(self):
+        self.filepath = os.path.join(tempfile.gettempdir(), 'cache.pkl')
+        self.cache = {}
 
+    def load(self):
+        if os.path.exists(self.filepath):
+            with open(self.filepath, 'rb') as f:
+                self.cache = pickle.load(f)
+
+    def dump(self):
+        with open(self.filepath, 'wb') as f:
+            pickle.dump(self.cache, f)
 # Set your Azure OpenAI API key
 azure_openai_api_key = AZURE_OPENAI_API_KEY
  
@@ -25,6 +39,9 @@ llm = AzureOpenAI(
     api_base = "https://i2r-openai.openai.azure.com/",
     api_version="2023-07-01-preview"
 )
+# Initialize Cache object
+cache = Cache()
+cache.load()  # Load cache from disk
 # Create PandasAI object, passing the LLM
 #pandas_ai = PandasAI(llm, save_charts=True)
 pandas_ai = PandasAI(llm, save_charts=True, save_charts_path =  "exports\\charts\\temp_chart.png")
@@ -133,7 +150,7 @@ with st.expander("Want to connect to your Snowflake?"):
 #Process the uploaded PDF file and store a profile report only when first created
 if pdf_uploaded_file:
     pdf_file_content = pdf_uploaded_file.read()
-    
+    cache.dump()  # Dump cache to disk after processing PDF file
 
 # Display the uploaded CSV files
 if uploaded_files:
@@ -147,7 +164,7 @@ if uploaded_files:
 
         st.subheader(f"Uploaded Table {file_num}")
         st.dataframe(df)
-
+        cache.dump()  # Dump cache to disk after reading CSV files
 # Remove profiles associated with removed CSV files
 existing_profiles = list(st.session_state.profiles.keys())
 for existing_profile in existing_profiles:
